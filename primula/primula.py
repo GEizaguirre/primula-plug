@@ -34,15 +34,15 @@ class Primula():
             if user_input.lower() == "n": return
              
 
-        funcs = [ 20, 40, 60, 80, 100 ]
-        file_sizes = [ 5 ]
+        funcs = [ 200, 400, 600, 800, 1000 ]
+        file_sizes = [ 5, 25 ]
         
         for file_size in file_sizes:
             profile(bucket_name=bucket_name,
                     mb_per_file=file_size,
                     functions = funcs,
                     runtime_memory=1769,
-                    number_of_files=5,
+                    number_of_files=50/file_size,
                     replica_number=1)
 
         
