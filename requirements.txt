@@ -1,0 +1,4 @@
+numpy
+lithops
+scikit-learn
+matplotlib
