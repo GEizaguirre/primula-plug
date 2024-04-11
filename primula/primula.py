@@ -42,7 +42,7 @@ class Primula():
                     mb_per_file=file_size,
                     functions = funcs,
                     runtime_memory=1769,
-                    number_of_files=50/file_size,
+                    number_of_files=50//file_size,
                     replica_number=1)
 
         
