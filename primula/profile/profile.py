@@ -332,7 +332,7 @@ def _profile(bucket_name: str,
     
 def profile(bucket_name: str,
              mb_per_file: int, 
-             functions: List[int] = [200, 400, 600, 800, 1000],
+             functions: List[int],
              runtime_memory: int = 1769,
              number_of_files: int = None,
              debug: bool = False,
@@ -340,7 +340,7 @@ def profile(bucket_name: str,
     
     sorted_functions = sorted(functions, reverse=True)
     print(f"Warming up {functions[0]} functions")
-    warm_up(runtime_memory, functions[0])
+    warm_up(runtime_memory, max(functions))
     
     for num_functions in sorted_functions:
         

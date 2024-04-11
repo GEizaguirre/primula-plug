@@ -6,13 +6,17 @@ from primula.infer.Infer import infer_all_to_all, infer_read, infer_write
 import os
 from primula.profile import PRIMULA_HOME_DIR
 import pickle
+from typing import List
+
+DEFAULT_PROFILE_WORKERS = [ 200, 400, 600, 800, 1000 ]
+DEFAULT_FILE_SIZES =  [5, 25]
 
 class Primula():
 
     def __init__(self):
         pass
 
-    def setup(self, bucket_name: str = None, force: bool = False):
+    def setup(self, bucket_name: str = None, force: bool = False, workers: List[int] = DEFAULT_PROFILE_WORKERS, file_sizes: List[int] = DEFAULT_FILE_SIZES):
               
         lithops_config = load_config()
         storage_backend = lithops_config['lithops']['storage']
@@ -32,15 +36,12 @@ class Primula():
             print("Model for backend {storage_backend} already exists. Do you still want to profile the backend?")
             user_input = input("(Y/n): ")
             if user_input.lower() == "n": return
-             
-
-        funcs = [ 200, 400, 600, 800, 1000 ]
-        file_sizes = [ 5, 25 ]
+            
         
         for file_size in file_sizes:
             profile(bucket_name=bucket_name,
                     mb_per_file=file_size,
-                    functions = funcs,
+                    functions = workers,
                     runtime_memory=1769,
                     number_of_files=50//file_size,
                     replica_number=1)
