@@ -41,14 +41,6 @@ class Model():
             file_size : self._model(self.read_data[file_size]) for file_size in self.read_data.keys()
         }
         
-
-        self.bandwidth_write = {
-            file_size : self._get_bandwidth(self.write_data[file_size], file_size) for file_size in self.write_data.keys()
-        }
-        self.bandwidth_read = {
-            file_size : self._get_bandwidth(self.read_data[file_size], file_size) for file_size in self.read_data.keys()
-        }
-        
     
     def _model(self, data) -> Tuple[List[LinearRegression], List[int]]:
         
@@ -235,8 +227,14 @@ class Model():
                 }
         """
         
+        print(data)
+        
         write_data = dict()
         read_data = dict()
+        
+        write_bandwidth = dict()
+        read_bandwidth = dict()
+        
         for s in data['samples']:
             
             file_size = s["file_size"]
@@ -244,27 +242,39 @@ class Model():
             if file_size not in write_data.keys():
                 write_data[file_size] = dict()
                 read_data[file_size] = dict()
+                write_bandwidth[file_size] = dict()
+                read_bandwidth[file_size] = dict()
             
             w = s["workers"]
             
             if s["workers"] not in write_data[file_size].keys():
                 write_data[file_size][w] = []
+                write_bandwidth[file_size][w] = []
                 
             if s["workers"] not in read_data[file_size].keys():
                 read_data[file_size][w] = []
+                read_bandwidth[file_size][w] = []
                 
             write_data[file_size][w].append(s["write"])
             read_data[file_size][w].append(s["read"])
-        
+            write_bandwidth[file_size][w].append(s["write_bandwidth"])
+            read_bandwidth[file_size][w].append(s["read_bandwidth"])
     
         self.write_data = dict()
         self.read_data = dict()
+        self.bandwidth_write = dict()
+        self.bandwidth_read = dict()
         for file_size in write_data:
+            
             write_data[file_size] = {w: np.mean(write_data[file_size][w]) for w in write_data[file_size].keys()}
             self.write_data[file_size] = dict(sorted(write_data[file_size].items()))
+            
             read_data[file_size] = {w: np.mean(read_data[file_size][w]) for w in read_data[file_size].keys()}
             self.read_data[file_size] = dict(sorted(read_data[file_size].items()))
-    
+            
+            self.bandwidth_write[file_size] = max([ np.mean(write_bandwidth[file_size][w]) for w in write_bandwidth[file_size].keys() ])
+            self.bandwidth_read[file_size] = max([ np.mean(read_bandwidth[file_size][w]) for w in read_bandwidth[file_size].keys() ])
+
 
     def plot_points(self):
     

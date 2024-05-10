@@ -161,7 +161,7 @@ def write(bucket_name: str,
         Ops = len(key_names)/(after_time-before_time)
         print('WOP/s : '+str(Ops))
 
-        return {'start_time': before_time, 'end_time': after_time, 'ops': Ops}
+        return {'start_time': before_time, 'end_time': after_time, 'ops': Ops, 'bytes': bytes_n*len(key_names)}
 
     
     start_time = time.time()
@@ -203,7 +203,7 @@ def read(bucket_name: str,
     def reader(keys):
         
         storage = Storage()
-        m = hashlib.md5()
+        # m = hashlib.md5()
         bytes_read = 0
         
         synchro_simple(begin_datetime, begin_datetime.tzinfo)
@@ -211,23 +211,27 @@ def read(bucket_name: str,
         start_time = time.time()
         for key_name in keys:
             fileobj = storage.get_object(bucket_name, key_name, stream=True)
+            
             try:
                 buf = fileobj.read(blocksize)
+                
+                
                 while len(buf) > 0:
                     bytes_read += len(buf)
                     #if bytes_read % (blocksize *10) == 0:
                     #    mb_rate = bytes_read/(time.time()-t1)/1e6
                     #    print('POS:'+str(bytes_read)+' MB Rate: '+ str(mb_rate))
-                    m.update(buf)
+                    # m.update(buf)
                     buf = fileobj.read(blocksize)
             except Exception as e:
                 print(e)
                 pass
         end_time = time.time()
+
         Ops = len(keys)/(end_time-start_time)
         print('ROP/s : '+str(Ops))
 
-        return {'start_time': start_time, 'end_time': end_time, 'ops': Ops}
+        return {'start_time': start_time, 'end_time': end_time, 'ops': Ops, 'bytes': bytes_read}
  
 
     
@@ -238,6 +242,7 @@ def read(bucket_name: str,
     total_time = end_time-start_time
 
     results = [gbs for gbs in results if gbs is not None]
+    
     worker_stats = [f.stats for f in worker_futures if not f.error]
 
     res = {'start_time': start_time,

@@ -78,6 +78,7 @@ def infer_read(D: int, model: Model, p: int = None, requests_per_worker: int = 1
                       model.get_read_bandwidth(mb_per_file if mb_per_file is not None else dmb / p / requests_per_worker ),
                       model.get_throughput_read(p, mb_per_file if mb_per_file is not None else dmb / p / requests_per_worker ))
 
+
         return p, io_time
     
     else:
@@ -190,5 +191,8 @@ def eq_shuffle(D, p, bandwidth_read, bandwidth_write, throughput_read, throughpu
 
 
 def eq_io(D, p, requests_per_worker, bandwidth_per_worker, agg_throughput):
+    
+    bandwidth_limit = D / (bandwidth_per_worker * p)
+    throughput_limit = p * requests_per_worker / agg_throughput
         
-    return max(D / (bandwidth_per_worker * p), p * requests_per_worker / agg_throughput )
+    return max(bandwidth_limit, throughput_limit )
